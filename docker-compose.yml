@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  mysqldb:
+    container_name: mysqldb
+    image: mysql:8.0.31
+    volumes:
+      - db:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - db-app
+    environment:
+      MYSQL_DATABASE: star_wars
+      MYSQL_ROOT_PASSWORD: 123
+
+  springboot-app:
+    container_name: recruitment-task
+    image: springboot-app
+    restart: on-failure
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - db-app
+    environment:
+      MYSQL_HOST: mysqldb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123
+      MYSQL_PORT: 3306
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/star_wars
+    depends_on:
+      - mysqldb
+
+networks:
+  db-app:
+
+volumes:
+  db:
